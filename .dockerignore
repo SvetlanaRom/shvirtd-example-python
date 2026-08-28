@@ -1,4 +1,10 @@
-.Dockerfile
-.README.md
-.schema.pdf
-.requirements.txt
+Dockerfile
+README.md
+schema.pdf
+requirements.txt
+proxy.yaml
+compose.yaml
+.env
+haproxy/
+nginx/
+.git/
