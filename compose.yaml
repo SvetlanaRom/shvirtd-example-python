@@ -1,0 +1,47 @@
+name: project
+
+include:
+  - path: ./proxy.yaml
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: web_python
+    restart: on-failure
+    networks:
+      backend:
+        ipv4_address: 172.20.0.5
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_TABLE=my_table
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 5
+      interval: 5s
+    container_name: mysql_database
+    networks:
+      backend:
+        ipv4_address: 172.20.0.10
+    restart: on-failure
+    volumes:
+      - db_data:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_HOST=%
+
+volumes:
+  db_data:
